@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #faf6ee;
+  --foreground: #1a1c20;
+}
+
+html {
+  direction: rtl;
+}
+
+body {
+  background: linear-gradient(180deg, #faf6ee 0%, #f5ede0 100%);
+  color: var(--foreground);
+  font-family: var(--font-cairo), system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Watermark overlay used on previews */
+.watermark-grid {
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      rgba(212, 150, 28, 0.18) 0,
+      rgba(212, 150, 28, 0.18) 2px,
+      transparent 2px,
+      transparent 60px
+    );
+}
+
+.watermark-text::before {
+  content: "zefaf.online • معاينة • ادفع وفعّل";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: rgba(212, 150, 28, 0.75);
+  letter-spacing: 0.3em;
+  transform: rotate(-22deg);
+  pointer-events: none;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.ornament-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #d4961c;
+}
+
+.ornament-divider::before,
+.ornament-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
+}
+
+::selection {
+  background: #f5e08a;
+  color: #1a1c20;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #f5ede0;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4961c;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #b67616;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

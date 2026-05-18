@@ -1,0 +1,20 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getOrder, updateOrder } from "@/lib/orders";
+
+export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const { id } = await ctx.params;
+  const order = getOrder(id);
+  if (!order) return NextResponse.json({ error: "الطلب غير موجود" }, { status: 404 });
+  const body = await req.json();
+  const updated = updateOrder(id, {
+    receipt: {
+      method: body.method ?? "vodafone_cash",
+      image: body.image,
+      note: body.note,
+      uploadedAt: new Date().toISOString(),
+    },
+    customer: { ...order.customer, name: body.name, phone: body.phone },
+    status: "pending_review",
+  });
+  return NextResponse.json({ ok: true, order: updated });
+}
