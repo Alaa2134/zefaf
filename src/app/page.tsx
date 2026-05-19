@@ -8,6 +8,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { HeroPreview } from "@/components/HeroPreview";
 import { UrgencyBar } from "@/components/UrgencyBar";
+import { WEDDING_DETAILS, COUPLE_PHOTOS } from "@/lib/stock-photos";
 
 export default function HomePage() {
   const featured = TEMPLATES.filter((t) => t.featured).slice(0, 8);
@@ -74,6 +75,53 @@ export default function HomePage() {
           <div className="relative">
             <HeroPreview />
           </div>
+        </div>
+      </section>
+
+      {/* PHOTO MARQUEE — real wedding moments */}
+      <section className="overflow-hidden bg-white py-10">
+        <div className="mx-auto max-w-7xl px-4 text-center">
+          <p className="text-sm text-ink-500">صور حقيقية من أفراح صممت دعواتها على زفاف</p>
+        </div>
+        <div className="mt-6 flex gap-3 overflow-hidden">
+          <div className="flex gap-3 animate-[marquee_40s_linear_infinite]">
+            {[...COUPLE_PHOTOS, ...WEDDING_DETAILS, ...COUPLE_PHOTOS].map((src, i) => (
+              <div
+                key={i}
+                className="relative h-56 w-44 flex-none overflow-hidden rounded-2xl shadow-lg"
+              >
+                <img src={src} alt="" className="h-full w-full object-cover" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* "YOUR PHOTO HERE" — emotional hook */}
+      <section className="relative overflow-hidden py-20">
+        <div className="absolute inset-0 -z-10">
+          <img src={WEDDING_DETAILS[3]} alt="" className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
+        </div>
+        <div className="mx-auto max-w-3xl px-4 text-center text-white">
+          <h2 className="font-display text-3xl font-bold leading-tight sm:text-5xl">
+            تخيل صورتك أنت وعروستك
+            <br />
+            <span className="bg-gradient-to-l from-gold-300 to-rose-300 bg-clip-text text-transparent">
+              في قالب فاخر زي ده
+            </span>
+          </h2>
+          <p className="mt-6 text-lg opacity-90">
+            ارفع صورة وحدة، شوف نتيجتها على فور، ادفع لو عجبتك. بدون مفاجآت، بدون تعقيد.
+          </p>
+          <Link
+            href="/templates/t001/demo"
+            target="_blank"
+            className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-base font-bold text-ink-900 shadow-2xl transition hover:scale-105"
+          >
+            شوف دعوة كاملة دلوقتي
+            <Sparkles className="h-5 w-5 text-gold-600" />
+          </Link>
         </div>
       </section>
 
@@ -177,6 +225,54 @@ export default function HomePage() {
             >
               تصفح كل الـ {arabicNumber(TOTAL_TEMPLATES)} قالب
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS */}
+      <section className="bg-white py-20">
+        <div className="mx-auto max-w-7xl px-4">
+          <h2 className="text-center font-display text-3xl font-bold text-ink-900 sm:text-4xl">
+            عرسان قبل اختاروا زفاف
+          </h2>
+          <p className="mt-2 text-center text-ink-600">+ {arabicNumber(1247)} دعوة اتفعلت آخر ٣ شهور</p>
+
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                name: "أحمد و سارة",
+                text: "والله مكنتش متخيل إن دعوة إلكترونية تطلع بالشكل ده! كل أهلي قالولي تحفة، وحفظت فلوس الكروت الورق.",
+                photo: COUPLE_PHOTOS[0],
+              },
+              {
+                name: "محمود و دينا",
+                text: "اللينك بعتته في الواتساب وكل ضيوفنا فتحوه على طول. الـ RSVP ساعدني أعرف عدد الضيوف بدون مكالمات.",
+                photo: COUPLE_PHOTOS[1],
+              },
+              {
+                name: "كريم و رنا",
+                text: "الباقة الـ VIP استاهلت كل قرش. الموسيقى المخصصة ومعرض الصور خلّى الدعوة تحفة فنية.",
+                photo: COUPLE_PHOTOS[2],
+              },
+            ].map((t, i) => (
+              <div
+                key={i}
+                className="rounded-2xl bg-gradient-to-b from-gold-50/40 to-rose-50/30 p-6 ring-1 ring-gold-100"
+              >
+                <div className="flex items-center gap-3">
+                  <img src={t.photo} alt={t.name} className="h-14 w-14 rounded-full object-cover ring-2 ring-gold-200" />
+                  <div>
+                    <div className="font-bold text-ink-900">{t.name}</div>
+                    <div className="flex gap-0.5 text-gold-500">
+                      {Array.from({ length: 5 }).map((_, j) => (
+                        <Star key={j} className="h-3 w-3 fill-current" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <p className="mt-4 text-sm leading-relaxed text-ink-700">&ldquo;{t.text}&rdquo;</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

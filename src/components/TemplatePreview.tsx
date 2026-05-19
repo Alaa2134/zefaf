@@ -6,6 +6,7 @@ import { Template } from "@/lib/templates";
 import { TemplateOrnament } from "./TemplateOrnament";
 import { TemplateAnimation } from "./TemplateAnimation";
 import { formatArabicDate } from "@/lib/utils";
+import { pickCouplePhoto, pickGroomPhoto, pickBridePhoto, pickFloral } from "@/lib/stock-photos";
 
 export interface InvitationContent {
   groomName: string;
@@ -43,7 +44,17 @@ export function TemplatePreview({
   watermark?: boolean;
   animated?: boolean;
 }) {
-  const c: InvitationContent = { ...SAMPLE, ...(content ?? {}) };
+  // When in sample mode (gallery cards, demo), populate with real photos
+  // so users see a believable preview instead of placeholder text.
+  const sampled: Partial<InvitationContent> = sample
+    ? {
+        couplePhoto: pickCouplePhoto(template.id),
+        groomPhoto: pickGroomPhoto(template.id),
+        bridePhoto: pickBridePhoto(template.id),
+      }
+    : {};
+
+  const c: InvitationContent = { ...SAMPLE, ...sampled, ...(content ?? {}) };
   const p = template.palette;
   const isDark = ["midnight-rose", "obsidian-gold"].includes(template.paletteId);
 
@@ -90,33 +101,67 @@ const LAYOUTS: Record<Template["layout"], React.FC<LayoutProps>> = {
 
 function CenteredLayout({ template, content }: LayoutProps) {
   const p = template.palette;
+  const photo = content.couplePhoto || content.groomPhoto || content.bridePhoto;
   return (
-    <div className="relative z-10 flex h-full flex-col items-center justify-center p-6 text-center">
-      <TemplateOrnament style={template.decorativeStyle} color={p.primary} position="top" />
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        className="my-4 text-xs uppercase tracking-[0.3em]"
-        style={{ color: p.muted }}
-      >
-        دعوة زفاف
-      </motion.div>
-      <PhotoBubble content={content} palette={p} />
-      <CoupleNames content={content} palette={p} />
-      <Divider color={p.accent} />
-      <EventDetails content={content} palette={p} />
-      <TemplateOrnament style={template.decorativeStyle} color={p.primary} position="bottom" />
+    <div className="relative z-10 flex h-full flex-col items-center justify-center p-4 text-center">
+      {/* Floral backdrop tint */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `url(${pickFloral(template.id)})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          opacity: 0.18,
+          mixBlendMode: "multiply",
+        }}
+      />
+      <div className="relative z-10 flex h-full w-full flex-col items-center justify-center p-2 text-center">
+        <TemplateOrnament style={template.decorativeStyle} color={p.primary} position="top" />
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="my-2 text-xs uppercase tracking-[0.3em]"
+          style={{ color: p.muted }}
+        >
+          دعوة زفاف
+        </motion.div>
+        {photo && (
+          <div
+            className="my-2 h-24 w-24 overflow-hidden rounded-full ring-4 sm:h-28 sm:w-28"
+            style={{ boxShadow: `0 0 0 3px ${p.accent}, 0 8px 24px rgba(0,0,0,0.15)` }}
+          >
+            <img src={photo} alt="couple" className="h-full w-full object-cover" />
+          </div>
+        )}
+        <CoupleNames content={content} palette={p} />
+        <Divider color={p.accent} />
+        <EventDetails content={content} palette={p} />
+        <TemplateOrnament style={template.decorativeStyle} color={p.primary} position="bottom" />
+      </div>
     </div>
   );
 }
 
 function SplitLayout({ template, content }: LayoutProps) {
   const p = template.palette;
+  const photo = content.couplePhoto || content.groomPhoto || content.bridePhoto;
   return (
     <div className="relative z-10 grid h-full grid-cols-2">
-      <div className="flex items-center justify-center" style={{ background: p.primary }}>
-        <PhotoBubble content={content} palette={p} large />
+      <div className="relative overflow-hidden">
+        {photo ? (
+          <>
+            <img src={photo} alt="couple" className="absolute inset-0 h-full w-full object-cover" />
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(${p.primary}88, ${p.primary}33)`,
+              }}
+            />
+          </>
+        ) : (
+          <div className="absolute inset-0" style={{ background: p.primary }} />
+        )}
       </div>
       <div className="flex flex-col items-center justify-center p-4 text-center">
         <TemplateOrnament style={template.decorativeStyle} color={p.primary} position="top" small />
@@ -130,17 +175,38 @@ function SplitLayout({ template, content }: LayoutProps) {
 
 function FramedLayout({ template, content }: LayoutProps) {
   const p = template.palette;
+  const photo = content.couplePhoto || content.groomPhoto || content.bridePhoto;
   return (
-    <div className="relative z-10 h-full p-4">
+    <div className="relative z-10 h-full p-3">
+      {/* Floral backdrop tint */}
       <div
-        className="relative flex h-full flex-col items-center justify-center p-4 text-center"
+        className="absolute inset-0"
         style={{
+          backgroundImage: `url(${pickFloral(template.id)})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          opacity: 0.15,
+          mixBlendMode: "multiply",
+        }}
+      />
+      <div
+        className="relative flex h-full flex-col items-center justify-center p-3 text-center"
+        style={{
+          background: p.bg + "ee",
           border: `2px solid ${p.primary}`,
-          boxShadow: `inset 0 0 0 1px ${p.accent}, 0 0 0 4px ${p.bg}, 0 0 0 5px ${p.primary}`,
+          boxShadow: `inset 0 0 0 1px ${p.accent}`,
+          backdropFilter: "blur(2px)",
         }}
       >
         <TemplateOrnament style={template.decorativeStyle} color={p.primary} position="top" />
-        <PhotoBubble content={content} palette={p} />
+        {photo && (
+          <div
+            className="my-1 h-24 w-24 overflow-hidden rounded-full ring-4 sm:h-28 sm:w-28"
+            style={{ boxShadow: `0 0 0 3px ${p.accent}, 0 6px 18px rgba(0,0,0,0.2)` }}
+          >
+            <img src={photo} alt="couple" className="h-full w-full object-cover" />
+          </div>
+        )}
         <CoupleNames content={content} palette={p} />
         <Divider color={p.accent} />
         <EventDetails content={content} palette={p} />
@@ -152,15 +218,28 @@ function FramedLayout({ template, content }: LayoutProps) {
 
 function StackedLayout({ template, content }: LayoutProps) {
   const p = template.palette;
+  const photo = content.couplePhoto || content.groomPhoto || content.bridePhoto;
   return (
     <div className="relative z-10 flex h-full flex-col">
-      <div
-        className="flex flex-1 items-center justify-center"
-        style={{
-          background: `linear-gradient(180deg, ${p.primary} 0%, ${p.accent} 100%)`,
-        }}
-      >
-        <PhotoBubble content={content} palette={p} large />
+      <div className="relative flex-1 overflow-hidden">
+        {photo ? (
+          <>
+            <img src={photo} alt="couple" className="absolute inset-0 h-full w-full object-cover" />
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(180deg, ${p.primary}66 0%, transparent 50%, ${p.bg} 100%)`,
+              }}
+            />
+          </>
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(180deg, ${p.primary} 0%, ${p.accent} 100%)`,
+            }}
+          />
+        )}
       </div>
       <div className="flex flex-1 flex-col items-center justify-center p-4 text-center">
         <CoupleNames content={content} palette={p} />
@@ -173,17 +252,31 @@ function StackedLayout({ template, content }: LayoutProps) {
 
 function CardLayout({ template, content }: LayoutProps) {
   const p = template.palette;
+  const photo = content.couplePhoto || content.groomPhoto || content.bridePhoto;
   return (
-    <div className="relative z-10 flex h-full items-center justify-center p-4">
+    <div className="relative z-10 flex h-full items-center justify-center p-3">
       <div
-        className="relative flex w-full max-w-md flex-col items-center rounded-2xl p-6 text-center shadow-2xl"
+        className="relative flex w-full max-w-md flex-col overflow-hidden rounded-2xl shadow-2xl"
         style={{ background: p.surface, border: `1px solid ${p.accent}` }}
       >
-        <TemplateOrnament style={template.decorativeStyle} color={p.primary} position="top" small />
-        <PhotoBubble content={content} palette={p} />
-        <CoupleNames content={content} palette={p} />
-        <Divider color={p.accent} />
-        <EventDetails content={content} palette={p} />
+        {/* Photo header */}
+        {photo && (
+          <div className="relative h-32 overflow-hidden sm:h-40">
+            <img src={photo} alt="couple" className="absolute inset-0 h-full w-full object-cover" />
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(180deg, transparent, ${p.surface})`,
+              }}
+            />
+          </div>
+        )}
+        <div className="flex flex-col items-center p-5 pt-2 text-center">
+          <TemplateOrnament style={template.decorativeStyle} color={p.primary} position="top" small />
+          <CoupleNames content={content} palette={p} />
+          <Divider color={p.accent} />
+          <EventDetails content={content} palette={p} />
+        </div>
       </div>
     </div>
   );
