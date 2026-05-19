@@ -7,7 +7,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: stri
   if (!body?.name || typeof body.attending !== "boolean") {
     return NextResponse.json({ error: "بيانات ناقصة" }, { status: 400 });
   }
-  const order = addRsvp(slug, {
+  const order = await addRsvp(slug, {
     name: body.name,
     phone: body.phone,
     attending: body.attending,

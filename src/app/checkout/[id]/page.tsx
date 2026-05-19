@@ -4,7 +4,7 @@ import { CheckoutClient } from "@/components/CheckoutClient";
 
 export default async function CheckoutPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const order = getOrder(id);
+  const order = await getOrder(id);
   if (!order) notFound();
   return <CheckoutClient orderId={id} order={JSON.parse(JSON.stringify(order))} />;
 }

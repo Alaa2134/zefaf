@@ -7,6 +7,7 @@ import { Logo } from "./Logo";
 import { SITE } from "@/lib/config";
 import { Order } from "@/lib/orders";
 import { formatEgp } from "@/lib/utils";
+import { compressImage } from "@/lib/compress";
 
 export function CheckoutClient({ orderId, order }: { orderId: string; order: Order }) {
   const router = useRouter();
@@ -25,12 +26,17 @@ export function CheckoutClient({ orderId, order }: { orderId: string; order: Ord
     setTimeout(() => setCopied(null), 1500);
   }
 
-  function onReceipt(file?: File) {
+  async function onReceipt(file?: File) {
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) return alert("الصورة كبيرة، اعمل ضغط للصورة وارفعها تاني");
-    const r = new FileReader();
-    r.onload = () => setReceiptImage(r.result as string);
-    r.readAsDataURL(file);
+    if (file.size > 12 * 1024 * 1024) return alert("الصورة كبيرة جداً، اعمل ضغط للصورة وارفعها تاني");
+    try {
+      const compressed = await compressImage(file, 1400, 0.85);
+      setReceiptImage(compressed);
+    } catch {
+      const r = new FileReader();
+      r.onload = () => setReceiptImage(r.result as string);
+      r.readAsDataURL(file);
+    }
   }
 
   async function submit() {

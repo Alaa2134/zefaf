@@ -12,8 +12,8 @@ export const dynamic = "force-dynamic";
 export default async function AdminPage() {
   if (!(await isAdmin())) redirect("/admin/login");
 
-  const orders = listOrders();
-  const stats = getStats();
+  const orders = await listOrders();
+  const stats = await getStats();
   const pending = orders.filter((o) => o.status === "pending_review");
   const paid = orders.filter((o) => o.status === "paid");
   const pendingPayment = orders.filter((o) => o.status === "pending_payment");

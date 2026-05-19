@@ -5,7 +5,7 @@ import { InvitationView } from "@/components/InvitationView";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const order = getOrderBySlug(slug);
+  const order = await getOrderBySlug(slug);
   if (!order) return { title: "دعوة فرح" };
   return {
     title: `فرح ${order.invitation.groomName} و ${order.invitation.brideName}`,
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function InvitationPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const order = getOrderBySlug(slug);
+  const order = await getOrderBySlug(slug);
   if (!order) notFound();
   if (order.status !== "paid") {
     return (
@@ -34,7 +34,7 @@ export default async function InvitationPage({ params }: { params: Promise<{ slu
       </main>
     );
   }
-  incrementViews(slug);
+  incrementViews(slug).catch(() => {});
   const template = getTemplate(order.templateId);
   if (!template) notFound();
   return <InvitationView order={JSON.parse(JSON.stringify(order))} template={template} />;

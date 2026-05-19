@@ -11,6 +11,7 @@ import { useDraft } from "@/lib/store";
 import { Logo } from "./Logo";
 import { formatEgp, arabicNumber } from "@/lib/utils";
 import { SITE } from "@/lib/config";
+import { compressImage } from "@/lib/compress";
 
 const TITLES_GROOM = ["", "أستاذ", "مهندس", "دكتور", "كابتن", "الحاج", "المهندس"];
 const TITLES_BRIDE = ["", "آنسة", "مهندسة", "دكتورة", "الحاجة"];
@@ -48,15 +49,21 @@ export function EditorClient({ template }: { template: Template }) {
     return () => document.removeEventListener("mouseleave", onLeave);
   }, []);
 
-  function handlePhoto(field: "groomPhoto" | "bridePhoto" | "couplePhoto", file?: File) {
+  async function handlePhoto(field: "groomPhoto" | "bridePhoto" | "couplePhoto", file?: File) {
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      alert("الصورة كبيرة، يرجى صورة أقل من ٥ ميجا");
+    if (file.size > 12 * 1024 * 1024) {
+      alert("الصورة كبيرة جداً، يرجى صورة أقل من ١٢ ميجا");
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => setField(field, reader.result as string);
-    reader.readAsDataURL(file);
+    try {
+      const compressed = await compressImage(file, 1600, 0.82);
+      setField(field, compressed);
+    } catch {
+      // Fallback to raw read on compression failure
+      const reader = new FileReader();
+      reader.onload = () => setField(field, reader.result as string);
+      reader.readAsDataURL(file);
+    }
   }
 
   const fullGroomName = `${titleGroom ? titleGroom + " " : ""}${draft.groomName || "العريس"}`;
