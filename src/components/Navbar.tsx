@@ -11,7 +11,7 @@ export function Navbar() {
     <header className="sticky top-0 z-40 border-b border-gold-100/60 bg-white/85 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
         <Logo />
-        <nav className="hidden items-center gap-6 lg:flex">
+        <nav className="hidden items-center gap-5 lg:flex">
           <Link href="/templates" className="text-sm font-medium text-ink-700 hover:text-gold-700">
             القوالب
           </Link>
@@ -21,11 +21,14 @@ export function Navbar() {
           <Link href="/dashboard" className="text-sm font-medium text-ink-700 hover:text-gold-700">
             دعوتي
           </Link>
+          <Link href="/login" className="text-sm font-medium text-ink-700 hover:text-gold-700">
+            دخول
+          </Link>
           <Link
-            href="/templates"
+            href="/signup"
             className="rounded-full bg-gradient-to-l from-gold-600 to-rose-600 px-5 py-2 text-sm font-bold text-white shadow-md transition hover:shadow-lg"
           >
-            ابدأ دلوقتي
+            اعمل حساب
           </Link>
         </nav>
         <button
@@ -48,12 +51,15 @@ export function Navbar() {
             <Link onClick={() => setOpen(false)} href="/dashboard" className="rounded-lg p-2 hover:bg-gold-50">
               دعوتي
             </Link>
+            <Link onClick={() => setOpen(false)} href="/login" className="rounded-lg p-2 hover:bg-gold-50">
+              دخول
+            </Link>
             <Link
               onClick={() => setOpen(false)}
-              href="/templates"
+              href="/signup"
               className="rounded-lg bg-gradient-to-l from-gold-600 to-rose-600 p-2 text-center font-bold text-white"
             >
-              ابدأ دلوقتي
+              اعمل حساب
             </Link>
           </div>
         </div>

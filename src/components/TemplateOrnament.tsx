@@ -2,6 +2,54 @@
 
 import { BaseTemplate } from "@/lib/templates";
 
+export function CornerOrnaments({ color }: { color: string }) {
+  // Decorative corners — gold leaf style flourishes
+  const corner = (
+    <svg viewBox="0 0 80 80" className="absolute h-12 w-12 sm:h-16 sm:w-16" fill="none">
+      <defs>
+        <linearGradient id={`co-grad-${color.replace(/[^a-z0-9]/gi, "")}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={color} stopOpacity="1" />
+          <stop offset="100%" stopColor={color} stopOpacity="0.4" />
+        </linearGradient>
+      </defs>
+      <g stroke={`url(#co-grad-${color.replace(/[^a-z0-9]/gi, "")})`} strokeWidth="1.5" strokeLinecap="round">
+        <path d="M 5 5 L 35 5" />
+        <path d="M 5 5 L 5 35" />
+        <path d="M 10 10 L 30 10" opacity="0.6" />
+        <path d="M 10 10 L 10 30" opacity="0.6" />
+        <circle cx="5" cy="5" r="2.5" fill={color} />
+      </g>
+      <g fill={color}>
+        <circle cx="20" cy="5" r="1.2" />
+        <circle cx="5" cy="20" r="1.2" />
+        <path d="M 12 12 Q 22 18 28 28 Q 24 24 14 24 Q 22 16 12 12 Z" opacity="0.5" />
+      </g>
+    </svg>
+  );
+  return (
+    <>
+      <div className="pointer-events-none absolute right-2 top-2">{corner}</div>
+      <div className="pointer-events-none absolute left-2 top-2 scale-x-[-1]">{corner}</div>
+      <div className="pointer-events-none absolute right-2 bottom-2 scale-y-[-1]">{corner}</div>
+      <div className="pointer-events-none absolute left-2 bottom-2 scale-x-[-1] scale-y-[-1]">{corner}</div>
+    </>
+  );
+}
+
+export function GoldFoilOverlay() {
+  // A subtle gold-foil shimmer effect via gradient
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 opacity-20"
+      style={{
+        background:
+          "linear-gradient(135deg, transparent 0%, rgba(245,224,138,0.4) 25%, transparent 50%, rgba(212,150,28,0.3) 75%, transparent 100%)",
+        mixBlendMode: "overlay",
+      }}
+    />
+  );
+}
+
 export function TemplateOrnament({
   style,
   color,
