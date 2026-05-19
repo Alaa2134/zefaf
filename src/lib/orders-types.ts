@@ -5,6 +5,7 @@ export interface Order {
   slug: string;
   templateId: string;
   tier?: "basic" | "premium" | "vip";
+  userId?: string;
   createdAt: string;
   status: OrderStatus;
   price: number;

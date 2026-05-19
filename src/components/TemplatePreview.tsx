@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Template } from "@/lib/templates";
-import { TemplateOrnament } from "./TemplateOrnament";
+import { TemplateOrnament, CornerOrnaments, GoldFoilOverlay } from "./TemplateOrnament";
 import { TemplateAnimation } from "./TemplateAnimation";
 import { formatArabicDate } from "@/lib/utils";
 import { pickCouplePhoto, pickGroomPhoto, pickBridePhoto, pickFloral } from "@/lib/stock-photos";
@@ -151,19 +151,54 @@ function SplitLayout({ template, content }: LayoutProps) {
       <div className="relative overflow-hidden">
         {photo ? (
           <>
-            <img src={photo} alt="couple" className="absolute inset-0 h-full w-full object-cover" />
+            <img
+              src={photo}
+              alt="couple"
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ filter: "saturate(1.1) contrast(1.05)" }}
+            />
+            {/* Cinematic gradient */}
             <div
               className="absolute inset-0"
               style={{
-                background: `linear-gradient(${p.primary}88, ${p.primary}33)`,
+                background: `linear-gradient(${p.primary}55, transparent 40%, ${p.primary}77)`,
+              }}
+            />
+            {/* Vignette */}
+            <div
+              className="absolute inset-0"
+              style={{
+                boxShadow: `inset 0 0 80px ${p.primary}66`,
               }}
             />
           </>
         ) : (
           <div className="absolute inset-0" style={{ background: p.primary }} />
         )}
+        {/* Side label */}
+        <div
+          className="absolute bottom-3 right-3 text-[10px] uppercase tracking-[0.3em] text-white opacity-90"
+          style={{ textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}
+        >
+          {formatArabicDate(content.date).split(" ").slice(0, 2).join(" ")}
+        </div>
       </div>
-      <div className="flex flex-col items-center justify-center p-4 text-center">
+      <div
+        className="relative flex flex-col items-center justify-center p-4 text-center"
+        style={{
+          background: `linear-gradient(135deg, ${p.bg}, ${p.surface})`,
+        }}
+      >
+        <div className="pointer-events-none absolute right-2 top-2">
+          <svg viewBox="0 0 60 60" className="h-10 w-10" fill="none" stroke={p.accent} strokeWidth="1">
+            <path d="M 5 5 L 25 5 L 5 25 Z" />
+          </svg>
+        </div>
+        <div className="pointer-events-none absolute bottom-2 left-2 rotate-180">
+          <svg viewBox="0 0 60 60" className="h-10 w-10" fill="none" stroke={p.accent} strokeWidth="1">
+            <path d="M 5 5 L 25 5 L 5 25 Z" />
+          </svg>
+        </div>
         <TemplateOrnament style={template.decorativeStyle} color={p.primary} position="top" small />
         <CoupleNames content={content} palette={p} compact />
         <Divider color={p.accent} />
@@ -185,32 +220,52 @@ function FramedLayout({ template, content }: LayoutProps) {
           backgroundImage: `url(${pickFloral(template.id)})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          opacity: 0.15,
+          opacity: 0.18,
           mixBlendMode: "multiply",
         }}
       />
+      {/* Double frame for elite feel */}
       <div
-        className="relative flex h-full flex-col items-center justify-center p-3 text-center"
+        className="relative h-full p-1.5"
         style={{
-          background: p.bg + "ee",
-          border: `2px solid ${p.primary}`,
-          boxShadow: `inset 0 0 0 1px ${p.accent}`,
-          backdropFilter: "blur(2px)",
+          background: `linear-gradient(135deg, ${p.primary}, ${p.accent}, ${p.primary})`,
+          boxShadow: `0 8px 30px ${p.primary}33`,
         }}
       >
-        <TemplateOrnament style={template.decorativeStyle} color={p.primary} position="top" />
-        {photo && (
-          <div
-            className="my-1 h-24 w-24 overflow-hidden rounded-full ring-4 sm:h-28 sm:w-28"
-            style={{ boxShadow: `0 0 0 3px ${p.accent}, 0 6px 18px rgba(0,0,0,0.2)` }}
-          >
-            <img src={photo} alt="couple" className="h-full w-full object-cover" />
-          </div>
-        )}
-        <CoupleNames content={content} palette={p} />
-        <Divider color={p.accent} />
-        <EventDetails content={content} palette={p} />
-        <TemplateOrnament style={template.decorativeStyle} color={p.primary} position="bottom" />
+        <div
+          className="relative flex h-full flex-col items-center justify-center overflow-hidden p-3 text-center"
+          style={{
+            background: p.bg + "f5",
+            border: `1px solid ${p.accent}`,
+            backdropFilter: "blur(2px)",
+          }}
+        >
+          <CornerOrnaments color={p.primary} />
+          <GoldFoilOverlay />
+          <TemplateOrnament style={template.decorativeStyle} color={p.primary} position="top" />
+          {photo && (
+            <div className="relative my-2">
+              <div
+                className="h-24 w-24 overflow-hidden rounded-full sm:h-32 sm:w-32"
+                style={{
+                  boxShadow: `0 0 0 3px ${p.bg}, 0 0 0 5px ${p.primary}, 0 0 0 7px ${p.accent}, 0 10px 30px rgba(0,0,0,0.25)`,
+                }}
+              >
+                <img src={photo} alt="couple" className="h-full w-full object-cover" />
+              </div>
+              <div
+                className="absolute inset-0 rounded-full"
+                style={{
+                  boxShadow: `inset 0 0 30px ${p.primary}44`,
+                }}
+              />
+            </div>
+          )}
+          <CoupleNames content={content} palette={p} />
+          <Divider color={p.accent} />
+          <EventDetails content={content} palette={p} />
+          <TemplateOrnament style={template.decorativeStyle} color={p.primary} position="bottom" />
+        </div>
       </div>
     </div>
   );
@@ -224,13 +279,28 @@ function StackedLayout({ template, content }: LayoutProps) {
       <div className="relative flex-1 overflow-hidden">
         {photo ? (
           <>
-            <img src={photo} alt="couple" className="absolute inset-0 h-full w-full object-cover" />
+            <img
+              src={photo}
+              alt="couple"
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ filter: "saturate(1.15) contrast(1.05)" }}
+            />
+            {/* Dramatic top-down gradient */}
             <div
               className="absolute inset-0"
               style={{
-                background: `linear-gradient(180deg, ${p.primary}66 0%, transparent 50%, ${p.bg} 100%)`,
+                background: `linear-gradient(180deg, ${p.primary}44 0%, transparent 30%, transparent 50%, ${p.bg} 100%)`,
               }}
             />
+            {/* Magazine-style overlay text */}
+            <div className="absolute inset-0 flex items-start justify-center pt-6">
+              <div
+                className="rounded-full bg-black/30 px-4 py-1 text-[10px] uppercase tracking-[0.4em] text-white backdrop-blur-sm"
+                style={{ textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}
+              >
+                ✦ دعوة زفاف ✦
+              </div>
+            </div>
           </>
         ) : (
           <div
@@ -241,7 +311,8 @@ function StackedLayout({ template, content }: LayoutProps) {
           />
         )}
       </div>
-      <div className="flex flex-1 flex-col items-center justify-center p-4 text-center">
+      <div className="relative flex flex-1 flex-col items-center justify-center p-4 text-center">
+        <GoldFoilOverlay />
         <CoupleNames content={content} palette={p} />
         <Divider color={p.accent} />
         <EventDetails content={content} palette={p} />
@@ -254,28 +325,64 @@ function CardLayout({ template, content }: LayoutProps) {
   const p = template.palette;
   const photo = content.couplePhoto || content.groomPhoto || content.bridePhoto;
   return (
-    <div className="relative z-10 flex h-full items-center justify-center p-3">
-      <div
-        className="relative flex w-full max-w-md flex-col overflow-hidden rounded-2xl shadow-2xl"
-        style={{ background: p.surface, border: `1px solid ${p.accent}` }}
-      >
-        {/* Photo header */}
-        {photo && (
-          <div className="relative h-32 overflow-hidden sm:h-40">
-            <img src={photo} alt="couple" className="absolute inset-0 h-full w-full object-cover" />
-            <div
-              className="absolute inset-0"
-              style={{
-                background: `linear-gradient(180deg, transparent, ${p.surface})`,
-              }}
-            />
+    <div className="relative z-10 flex h-full items-center justify-center p-2">
+      {/* Outer shadow shell */}
+      <div className="relative w-full max-w-md">
+        {/* Card */}
+        <div
+          className="relative flex flex-col overflow-hidden rounded-3xl"
+          style={{
+            background: p.surface,
+            boxShadow: `0 25px 50px -12px ${p.primary}44, 0 0 0 1px ${p.accent}, 0 0 0 4px ${p.bg}`,
+          }}
+        >
+          {/* Photo header with wedding details overlay */}
+          {photo && (
+            <div className="relative h-40 overflow-hidden sm:h-48">
+              <img
+                src={photo}
+                alt="couple"
+                className="absolute inset-0 h-full w-full object-cover"
+                style={{ filter: "saturate(1.1) contrast(1.05)" }}
+              />
+              {/* Bottom gradient fade */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `linear-gradient(180deg, ${p.primary}22 0%, transparent 50%, ${p.surface} 100%)`,
+                }}
+              />
+              {/* Vignette */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  boxShadow: `inset 0 0 60px ${p.primary}55`,
+                }}
+              />
+              {/* Date stamp */}
+              <div className="absolute right-3 top-3">
+                <div
+                  className="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur-sm"
+                  style={{ background: p.primary + "cc" }}
+                >
+                  Save the date
+                </div>
+              </div>
+            </div>
+          )}
+          <div className="flex flex-col items-center p-5 pt-3 text-center">
+            <TemplateOrnament style={template.decorativeStyle} color={p.primary} position="top" small />
+            <CoupleNames content={content} palette={p} />
+            <Divider color={p.accent} />
+            <EventDetails content={content} palette={p} />
           </div>
-        )}
-        <div className="flex flex-col items-center p-5 pt-2 text-center">
-          <TemplateOrnament style={template.decorativeStyle} color={p.primary} position="top" small />
-          <CoupleNames content={content} palette={p} />
-          <Divider color={p.accent} />
-          <EventDetails content={content} palette={p} />
+        </div>
+        {/* Decorative tag */}
+        <div
+          className="absolute -top-3 right-6 rotate-3 rounded-md px-3 py-1 text-[9px] font-bold uppercase tracking-widest shadow-md"
+          style={{ background: p.accent, color: p.bg }}
+        >
+          ✦ Wedding ✦
         </div>
       </div>
     </div>
@@ -326,7 +433,8 @@ function CoupleNames({
   palette: Template["palette"];
   compact?: boolean;
 }) {
-  const size = compact ? "text-lg sm:text-2xl" : "text-2xl sm:text-4xl";
+  const nameSize = compact ? "text-xl sm:text-3xl" : "text-3xl sm:text-5xl";
+  const ampSize = compact ? "text-2xl sm:text-4xl" : "text-4xl sm:text-6xl";
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -335,11 +443,22 @@ function CoupleNames({
       className="my-2 font-display font-bold leading-tight"
       style={{ color: palette.primary }}
     >
-      <div className={size}>{content.groomName}</div>
-      <div className="my-1 text-xl" style={{ color: palette.accent }}>
+      <div className={nameSize} style={{ letterSpacing: "0.02em" }}>
+        {content.groomName}
+      </div>
+      <div
+        className={`${ampSize} my-0.5 font-script italic`}
+        style={{
+          color: palette.accent,
+          fontWeight: 400,
+          textShadow: `0 1px 2px ${palette.primary}22`,
+        }}
+      >
         &amp;
       </div>
-      <div className={size}>{content.brideName}</div>
+      <div className={nameSize} style={{ letterSpacing: "0.02em" }}>
+        {content.brideName}
+      </div>
     </motion.div>
   );
 }

@@ -24,6 +24,14 @@ export async function listOrders(): Promise<Order[]> {
   return json_listOrders();
 }
 
+export async function listOrdersByUser(userId: string): Promise<Order[]> {
+  if (hasSupabase()) {
+    const { sb_listOrdersByUser } = await import("./db/orders-supabase");
+    return sb_listOrdersByUser(userId);
+  }
+  return json_listOrders().filter((o) => o.userId === userId);
+}
+
 export async function getOrder(id: string): Promise<Order | undefined> {
   if (hasSupabase()) {
     const { sb_getOrder } = await import("./db/orders-supabase");

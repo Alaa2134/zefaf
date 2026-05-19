@@ -25,6 +25,7 @@ create table if not exists public.orders (
 
   -- Invitation content (JSONB for flexibility)
   invitation jsonb not null,
+  user_id uuid references auth.users(id) on delete set null,
   referred_by text,
   coupon_code text,
   coupon_discount integer,
@@ -46,6 +47,7 @@ create table if not exists public.orders (
 create index if not exists orders_slug_idx on public.orders (slug);
 create index if not exists orders_status_idx on public.orders (status);
 create index if not exists orders_created_at_idx on public.orders (created_at desc);
+create index if not exists orders_user_id_idx on public.orders (user_id);
 
 -- ============================================================
 -- RSVPS table

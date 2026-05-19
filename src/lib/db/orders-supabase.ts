@@ -7,6 +7,7 @@ interface OrderRow {
   slug: string;
   template_id: string;
   tier: string | null;
+  user_id: string | null;
   created_at: string;
   status: OrderStatus;
   price: number;
@@ -31,6 +32,7 @@ function fromRow(row: OrderRow, rsvps: RSVP[] = []): Order {
     slug: row.slug,
     templateId: row.template_id,
     tier: (row.tier as Order["tier"]) ?? "basic",
+    userId: row.user_id ?? undefined,
     createdAt: row.created_at,
     status: row.status,
     price: row.price,
@@ -83,6 +85,17 @@ export async function sb_listOrders(): Promise<Order[]> {
   });
 
   return (orders as OrderRow[]).map((row) => fromRow(row, byOrder.get(row.id) ?? []));
+}
+
+export async function sb_listOrdersByUser(userId: string): Promise<Order[]> {
+  const sb = supabaseAdmin();
+  const { data, error } = await sb
+    .from("orders")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map((row) => fromRow(row as OrderRow, []));
 }
 
 export async function sb_getOrder(id: string): Promise<Order | undefined> {
@@ -144,6 +157,7 @@ export async function sb_createOrder(input: Omit<Order, "id" | "slug" | "created
       slug,
       template_id: input.templateId,
       tier: input.tier ?? "basic",
+      user_id: input.userId ?? null,
       status: "pending_payment",
       price: input.price,
       remove_branding: input.removeBranding ?? false,
