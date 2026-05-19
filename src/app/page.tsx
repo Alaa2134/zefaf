@@ -56,10 +56,11 @@ export default function HomePage() {
                 <Sparkles className="h-5 w-5 transition-transform group-hover:rotate-12" />
               </Link>
               <Link
-                href="#examples"
+                href="/templates/t001/demo"
+                target="_blank"
                 className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-4 text-base font-bold text-ink-700 shadow-md ring-1 ring-ink-100 transition hover:bg-ink-50"
               >
-                شوف الأمثلة
+                شوف دعوة كاملة 👁
               </Link>
             </div>
 

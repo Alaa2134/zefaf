@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Heart, Sparkles, ChevronLeft, Music, Image as ImageIcon, Send, Star } from "lucide-react";
+import { Heart, Sparkles, ChevronLeft, Music, Image as ImageIcon, Send, Star, Eye } from "lucide-react";
 import { Template } from "@/lib/templates";
 import { TemplatePreview } from "./TemplatePreview";
 import { useDraft } from "@/lib/store";
@@ -64,6 +64,15 @@ export function TemplateDetailClient({ template }: { template: Template }) {
             ابدأ صمّم دعوتك بصورك
             <Sparkles className="h-5 w-5" />
           </button>
+
+          <Link
+            href={`/templates/${template.id}/demo`}
+            target="_blank"
+            className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-gold-300 bg-white px-8 py-3 text-base font-bold text-gold-700 shadow transition hover:bg-gold-50"
+          >
+            <Eye className="h-5 w-5" />
+            شوف الدعوة الكاملة (معاينة حية)
+          </Link>
 
           <p className="mt-3 text-center text-xs text-ink-500">
             ✓ معاينة فورية قبل الدفع — لا يخصم منك شيء قبل ما توافق على شكل الدعوة

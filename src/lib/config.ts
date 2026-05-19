@@ -11,7 +11,7 @@ export const SITE = {
   payment: {
     vodafoneCash: "01065316500",
     instapay: "01065316500",
-    instapayHandle: "alaa2134@instapay",
+    instapayHandle: "alaa00saber",
   },
   contact: {
     whatsapp: "201065316500",
