@@ -114,10 +114,13 @@ export function InvitationView({ order, template }: { order: Order; template: Te
         )}
       </div>
 
-      {/* Audio (silent placeholder — replace with real track per musicChoice) */}
+      {/* Audio — uses custom URL if VIP set one, else the picked library track */}
       {order.invitation.enableMusic && (
         <audio ref={audioRef} loop>
-          <source src="/music/oud.mp3" type="audio/mpeg" />
+          <source
+            src={order.invitation.musicUrl || `/music/${order.invitation.musicChoice}.mp3`}
+            type="audio/mpeg"
+          />
         </audio>
       )}
 
@@ -141,7 +144,25 @@ export function InvitationView({ order, template }: { order: Order; template: Te
           style={{ y: heroY, scale: heroScale, opacity: heroOpacity }}
           className="absolute inset-0"
         >
-          {heroPhoto ? (
+          {order.invitation.backgroundVideo ? (
+            <>
+              <video
+                src={order.invitation.backgroundVideo}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="absolute inset-0 h-full w-full object-cover"
+                style={{ filter: "brightness(0.55) saturate(1.15)" }}
+              />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `linear-gradient(180deg, ${p.primary}66 0%, transparent 40%, ${p.bg} 100%)`,
+                }}
+              />
+            </>
+          ) : heroPhoto ? (
             <>
               <img
                 src={heroPhoto}
@@ -370,6 +391,28 @@ export function InvitationView({ order, template }: { order: Order; template: Te
         </motion.div>
       </Section>
 
+      {/* VOICE NOTE from the groom */}
+      {order.invitation.voiceNote && (
+        <Section bg={p.bg}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.7 }}
+            className="rounded-3xl p-6 text-center shadow-xl ring-1"
+            style={{ background: p.surface, borderColor: p.accent + "33" }}
+          >
+            <div className="text-xs uppercase tracking-widest" style={{ color: p.muted }}>
+              رسالة صوتية من العريس
+            </div>
+            <p className="mt-2 font-display text-lg" style={{ color: p.primary }}>
+              🎙️ اضغط شغّل
+            </p>
+            <audio src={order.invitation.voiceNote} controls className="mx-auto mt-3 w-full max-w-md" />
+          </motion.div>
+        </Section>
+      )}
+
       {/* MESSAGE / invitation text */}
       <Section bg={p.bg}>
         <motion.div
@@ -460,6 +503,19 @@ export function InvitationView({ order, template }: { order: Order; template: Te
         >
           <MapPin className="h-5 w-5" />
           افتح الموقع على الخريطة
+        </motion.a>
+
+        <motion.a
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          href={`/api/calendar/${order.slug}`}
+          className="mt-3 flex items-center justify-center gap-2 rounded-2xl border-2 px-6 py-4 font-bold shadow transition hover:scale-[1.02]"
+          style={{ borderColor: p.accent + "66", color: p.primary, background: p.surface }}
+        >
+          <Calendar className="h-5 w-5" />
+          أضف الفرح لتقويمي
         </motion.a>
       </Section>
 

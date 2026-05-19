@@ -23,8 +23,11 @@ export interface InvitationDraft {
   groomMotherName?: string;
   storyTitle?: string;
   storyText?: string;
+  voiceNote?: string;
+  backgroundVideo?: string;
   enableMusic: boolean;
   musicChoice: string;
+  musicUrl?: string;
 }
 
 const DEFAULT_DRAFT: InvitationDraft = {
