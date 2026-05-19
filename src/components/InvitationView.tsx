@@ -3,7 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { Heart, Share2, Music, MapPin, Calendar, Clock, Sparkles, ChevronDown, Camera, Users } from "lucide-react";
+import { Heart, Music, MapPin, Calendar, Clock, Sparkles, ChevronDown, Camera, Users } from "lucide-react";
+import { ShareButtons } from "./ShareButtons";
+import { formatArabicDate as fmt } from "@/lib/utils";
+import { TIERS } from "@/lib/config";
 import { Template } from "@/lib/templates";
 import { Order } from "@/lib/orders";
 import { TemplateAnimation } from "./TemplateAnimation";
@@ -24,6 +27,14 @@ export function InvitationView({ order, template }: { order: Order; template: Te
   const [opened, setOpened] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  const tier = TIERS[order.tier || "basic"];
+  const showQr = Boolean(tier.unlocks.qrCode);
+
+  const [pageUrl, setPageUrl] = useState("");
+  useEffect(() => {
+    if (typeof window !== "undefined") setPageUrl(window.location.href);
+  }, []);
+
   // Hero parallax
   const heroRef = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress: heroProgress } = useScroll({
@@ -33,20 +44,6 @@ export function InvitationView({ order, template }: { order: Order; template: Te
   const heroY = useTransform(heroProgress, [0, 1], ["0%", "30%"]);
   const heroScale = useTransform(heroProgress, [0, 1], [1, 1.15]);
   const heroOpacity = useTransform(heroProgress, [0, 0.8], [1, 0]);
-
-  function share() {
-    const url = typeof window !== "undefined" ? window.location.href : "";
-    if (navigator.share) {
-      navigator.share({
-        title: `فرح ${order.invitation.groomName} و ${order.invitation.brideName}`,
-        text: "ندعوكم لحضور فرحنا 🤍",
-        url,
-      }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(url);
-      alert("تم نسخ اللينك");
-    }
-  }
 
   function toggleMusic() {
     if (!audioRef.current) return;
@@ -76,17 +73,20 @@ export function InvitationView({ order, template }: { order: Order; template: Te
 
       {/* Floating controls */}
       <div className="fixed bottom-6 left-4 z-50 flex flex-col gap-2">
-        <motion.button
+        <motion.div
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 1.5 }}
-          onClick={share}
-          className="rounded-full p-3 shadow-2xl backdrop-blur transition hover:scale-110"
-          style={{ background: p.surface, color: p.primary }}
-          aria-label="شارك"
         >
-          <Share2 className="h-5 w-5" />
-        </motion.button>
+          <ShareButtons
+            url={pageUrl}
+            groomName={order.invitation.groomName}
+            brideName={order.invitation.brideName}
+            date={fmt(eventDate)}
+            palette={p}
+            showQr={showQr}
+          />
+        </motion.div>
         {order.invitation.enableMusic && (
           <motion.button
             initial={{ opacity: 0, scale: 0 }}

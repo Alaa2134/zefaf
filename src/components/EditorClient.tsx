@@ -33,7 +33,39 @@ export function EditorClient({ template }: { template: Template }) {
   const tier = TIERS[tierId];
   const unlocked = tier.unlocks;
   const removeBranding = unlocked.removeBranding ?? false;
-  const totalPrice = tier.price;
+  const basePrice = tier.price;
+
+  const [coupon, setCoupon] = useState("");
+  const [couponState, setCouponState] = useState<
+    | { valid: true; discount: number; finalPrice: number; description: string }
+    | { valid: false; reason: string }
+    | null
+  >(null);
+
+  const totalPrice = couponState?.valid ? couponState.finalPrice : basePrice;
+
+  async function validateCoupon() {
+    if (!coupon.trim()) {
+      setCouponState(null);
+      return;
+    }
+    const res = await fetch("/api/coupon", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: coupon, tier: tierId }),
+    });
+    const data = await res.json();
+    if (data.valid) {
+      setCouponState({
+        valid: true,
+        discount: data.discount,
+        finalPrice: data.finalPrice,
+        description: data.description,
+      });
+    } else {
+      setCouponState({ valid: false, reason: data.reason });
+    }
+  }
 
   useEffect(() => {
     if (hydrated && draft.templateId !== template.id) setTemplate(template.id);
@@ -339,6 +371,36 @@ export function EditorClient({ template }: { template: Template }) {
             <p className="mt-2 text-xs text-ink-500">
               تقدر تغيّر الباقة في أي وقت قبل الدفع — تفاصيل كل باقة في صفحة الأسعار
             </p>
+          </Section>
+
+          <Section title="🎁 كود خصم (اختياري)">
+            <div className="flex gap-2">
+              <input
+                value={coupon}
+                onChange={(e) => setCoupon(e.target.value.toUpperCase())}
+                placeholder="مثلاً: FARHET10"
+                className="flex-1 rounded-xl border border-ink-100 bg-white px-3 py-2.5 text-sm font-mono uppercase focus:border-gold-400 focus:outline-none"
+              />
+              <button
+                onClick={validateCoupon}
+                className="rounded-xl bg-ink-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-ink-800"
+              >
+                تطبيق
+              </button>
+            </div>
+            {couponState?.valid && (
+              <div className="mt-2 rounded-xl bg-emerald-50 p-3 text-sm">
+                <div className="font-bold text-emerald-700">✓ تم تطبيق الكود</div>
+                <div className="text-xs text-emerald-600">
+                  {couponState.description} — وفّرت {formatEgp(couponState.discount)}
+                </div>
+              </div>
+            )}
+            {couponState && !couponState.valid && (
+              <div className="mt-2 rounded-xl bg-rose-50 p-3 text-sm text-rose-700">
+                ✗ {couponState.reason}
+              </div>
+            )}
           </Section>
 
           <Section title="🎵 موسيقى الدعوة">
