@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Upload, Lock, ChevronRight, X, Heart, Send, Crown, Star } from "lucide-react";
+import { Sparkles, Upload, Lock, ChevronRight, X, Heart, Send, Crown, Star, Wand2, Mic, Square } from "lucide-react";
 import { Template } from "@/lib/templates";
 import { TemplatePreview } from "./TemplatePreview";
 import { useDraft } from "@/lib/store";
@@ -12,6 +12,8 @@ import { Logo } from "./Logo";
 import { formatEgp, arabicNumber } from "@/lib/utils";
 import { SITE, TIER_LIST, TIERS, type TierId } from "@/lib/config";
 import { compressImage } from "@/lib/compress";
+import { MUSIC_LIBRARY } from "@/lib/music";
+import { VoiceRecorder } from "./VoiceRecorder";
 
 const TITLES_GROOM = ["", "أستاذ", "مهندس", "دكتور", "كابتن", "الحاج", "المهندس"];
 const TITLES_BRIDE = ["", "آنسة", "مهندسة", "دكتورة", "الحاجة"];
@@ -137,8 +139,11 @@ export function EditorClient({ template }: { template: Template }) {
             brideMotherName: unlocked.parents ? draft.brideMotherName : undefined,
             storyTitle: unlocked.story ? draft.storyTitle : undefined,
             storyText: unlocked.story ? draft.storyText : undefined,
+            voiceNote: draft.voiceNote,
+            backgroundVideo: draft.backgroundVideo,
             enableMusic: draft.enableMusic,
             musicChoice: draft.musicChoice,
+            musicUrl: unlocked.customMusic ? draft.musicUrl : undefined,
           },
           price: totalPrice,
           removeBranding,
@@ -260,6 +265,11 @@ export function EditorClient({ template }: { template: Template }) {
               rows={3}
               className="w-full rounded-xl border border-ink-100 bg-white px-3 py-2.5 text-sm focus:border-gold-400 focus:outline-none"
               placeholder="بسم الله الرحمن الرحيم، يسعدنا أن ندعوكم..."
+            />
+            <AiTextGenerator
+              groomName={draft.groomName || "العريس"}
+              brideName={draft.brideName || "العروسة"}
+              onPick={(text) => setField("message", text)}
             />
           </Section>
 
@@ -420,17 +430,72 @@ export function EditorClient({ template }: { template: Template }) {
               </button>
             </div>
             {draft.enableMusic && (
-              <select
-                value={draft.musicChoice}
-                onChange={(e) => setField("musicChoice", e.target.value)}
-                className="mt-2 w-full rounded-xl border border-ink-100 bg-white px-3 py-2.5 text-sm focus:border-gold-400 focus:outline-none"
+              <>
+                <select
+                  value={draft.musicChoice}
+                  onChange={(e) => setField("musicChoice", e.target.value)}
+                  className="mt-2 w-full rounded-xl border border-ink-100 bg-white px-3 py-2.5 text-sm focus:border-gold-400 focus:outline-none"
+                >
+                  {MUSIC_LIBRARY.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.nameAr}
+                    </option>
+                  ))}
+                </select>
+                {unlocked.customMusic && (
+                  <Input
+                    value={draft.musicUrl ?? ""}
+                    onChange={(v) => setField("musicUrl", v)}
+                    placeholder="(VIP) لينك موسيقى مخصصة بصيغة mp3"
+                  />
+                )}
+              </>
+            )}
+          </Section>
+
+          <Section title="🎙️ رسالة صوتية للضيوف (اختياري)">
+            <VoiceRecorder
+              value={draft.voiceNote}
+              onChange={(v) => setField("voiceNote", v)}
+            />
+            <p className="mt-1 text-xs text-ink-500">
+              سجّل كلمة قصيرة من القلب، هتظهر في الدعوة بزرار تشغيل
+            </p>
+          </Section>
+
+          <Section title="🎬 فيديو خلفية (اختياري)">
+            <label className="flex aspect-video cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-ink-200 bg-ink-50 transition hover:border-gold-400 hover:bg-gold-50">
+              {draft.backgroundVideo ? (
+                <video src={draft.backgroundVideo} controls className="h-full w-full object-cover" />
+              ) : (
+                <div className="text-center">
+                  <Upload className="mx-auto h-6 w-6 text-ink-400" />
+                  <div className="mt-2 text-xs font-medium text-ink-600">
+                    ارفع فيديو قصير (لحظات مميزة) — حتى ١٥ ميجا
+                  </div>
+                </div>
+              )}
+              <input
+                type="file"
+                accept="video/*"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (!f) return;
+                  if (f.size > 15 * 1024 * 1024) return alert("الفيديو كبير، خليه أقل من ١٥ ميجا");
+                  const r = new FileReader();
+                  r.onload = () => setField("backgroundVideo", r.result as string);
+                  r.readAsDataURL(f);
+                }}
+              />
+            </label>
+            {draft.backgroundVideo && (
+              <button
+                onClick={() => setField("backgroundVideo", undefined)}
+                className="mt-2 text-xs text-rose-600 hover:underline"
               >
-                <option value="oud">عود هادئ</option>
-                <option value="piano">بيانو رومانسي</option>
-                <option value="zaffa">زفّة شعبية (طبل وزمر)</option>
-                <option value="quran">قراءة قرآن</option>
-                <option value="instrumental">موسيقى آلية</option>
-              </select>
+                إزالة الفيديو
+              </button>
             )}
           </Section>
 
@@ -611,6 +676,58 @@ function PhotoSlot({
         onChange={(e) => onChange(e.target.files?.[0])}
       />
     </label>
+  );
+}
+
+function AiTextGenerator({
+  groomName,
+  brideName,
+  onPick,
+}: {
+  groomName: string;
+  brideName: string;
+  onPick: (text: string) => void;
+}) {
+  const [busy, setBusy] = useState<string | null>(null);
+  async function gen(tone: string) {
+    setBusy(tone);
+    try {
+      const res = await fetch("/api/ai/invitation-text", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ groomName, brideName, tone }),
+      });
+      const data = await res.json();
+      if (data?.text) onPick(data.text);
+    } finally {
+      setBusy(null);
+    }
+  }
+  const tones: { id: string; label: string }[] = [
+    { id: "classic", label: "كلاسيك" },
+    { id: "modern", label: "عصري" },
+    { id: "romantic", label: "رومانسي" },
+    { id: "elegant", label: "فخم" },
+    { id: "friendly", label: "ودود" },
+  ];
+  return (
+    <div className="mt-2">
+      <p className="mb-1 inline-flex items-center gap-1 text-xs text-ink-500">
+        <Wand2 className="h-3 w-3" /> هل عايز نولّد نص دعوة على الذوق:
+      </p>
+      <div className="flex flex-wrap gap-1.5">
+        {tones.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => gen(t.id)}
+            disabled={busy !== null}
+            className="rounded-full bg-gold-50 px-3 py-1 text-xs font-medium text-gold-700 ring-1 ring-gold-200 transition hover:bg-gold-100 disabled:opacity-50"
+          >
+            {busy === t.id ? "..." : t.label}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 

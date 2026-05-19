@@ -26,8 +26,11 @@ export interface Order {
     brideMotherName?: string;
     storyTitle?: string;
     storyText?: string;
+    voiceNote?: string; // data URL or storage URL of a recorded voice greeting
+    backgroundVideo?: string; // optional looping video for hero
     enableMusic: boolean;
     musicChoice: string;
+    musicUrl?: string; // custom music URL (VIP)
   };
   removeBranding?: boolean;
   referredBy?: string;
