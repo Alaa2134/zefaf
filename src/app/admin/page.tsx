@@ -146,11 +146,17 @@ export default async function AdminPage() {
                   return (
                     <tr key={o.id} className="border-t border-ink-100">
                       <td className="px-3 py-2 font-bold text-ink-900">
-                        {o.invitation.groomName} ❤ {o.invitation.brideName}
+                        <Link href={`/admin/orders/${o.id}`} className="hover:text-gold-700">
+                          {o.invitation.groomName} ❤ {o.invitation.brideName}
+                        </Link>
                       </td>
                       <td className="px-3 py-2 text-ink-600">{t?.nameAr}</td>
                       <td className="px-3 py-2 text-gold-700">{formatEgp(o.price)}</td>
-                      <td className="px-3 py-2">{arabicNumber(o.rsvps.length)}</td>
+                      <td className="px-3 py-2">
+                        <Link href={`/admin/orders/${o.id}`} className="text-gold-700 hover:underline">
+                          {arabicNumber(o.rsvps.length)}
+                        </Link>
+                      </td>
                       <td className="px-3 py-2">{arabicNumber(o.views || 0)}</td>
                       <td className="px-3 py-2">
                         <Link href={`/i/${o.slug}`} target="_blank" className="text-gold-700 hover:underline">

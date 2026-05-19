@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { Heart, Music, MapPin, Calendar, Clock, Sparkles, ChevronDown, Camera, Users } from "lucide-react";
 import { ShareButtons } from "./ShareButtons";
+import { ExportButton } from "./ExportButton";
 import { formatArabicDate as fmt } from "@/lib/utils";
 import { TIERS } from "@/lib/config";
 import { Template } from "@/lib/templates";
@@ -72,7 +73,7 @@ export function InvitationView({ order, template }: { order: Order; template: Te
       </div>
 
       {/* Floating controls */}
-      <div className="fixed bottom-6 left-4 z-50 flex flex-col gap-2">
+      <div data-export-skip className="fixed bottom-6 left-4 z-50 flex flex-col gap-2">
         <motion.div
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -85,6 +86,17 @@ export function InvitationView({ order, template }: { order: Order; template: Te
             date={fmt(eventDate)}
             palette={p}
             showQr={showQr}
+          />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1.6 }}
+        >
+          <ExportButton
+            groomName={order.invitation.groomName}
+            brideName={order.invitation.brideName}
+            palette={p}
           />
         </motion.div>
         {order.invitation.enableMusic && (

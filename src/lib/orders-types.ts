@@ -30,6 +30,9 @@ export interface Order {
     musicChoice: string;
   };
   removeBranding?: boolean;
+  referredBy?: string;
+  couponCode?: string;
+  couponDiscount?: number;
   customer: {
     name?: string;
     phone?: string;

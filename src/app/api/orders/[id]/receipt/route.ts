@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOrder, updateOrder } from "@/lib/orders";
 import { notifyReceiptUploaded } from "@/lib/notify";
+import { emailOrderReceived } from "@/lib/email";
 
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
@@ -14,9 +15,12 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
       note: body.note,
       uploadedAt: new Date().toISOString(),
     },
-    customer: { ...order.customer, name: body.name, phone: body.phone },
+    customer: { ...order.customer, name: body.name, phone: body.phone, email: body.email ?? order.customer.email },
     status: "pending_review",
   });
-  if (updated) notifyReceiptUploaded(updated).catch(() => {});
+  if (updated) {
+    notifyReceiptUploaded(updated).catch(() => {});
+    emailOrderReceived(updated).catch(() => {});
+  }
   return NextResponse.json({ ok: true, order: updated });
 }

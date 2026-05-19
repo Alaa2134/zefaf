@@ -25,6 +25,9 @@ create table if not exists public.orders (
 
   -- Invitation content (JSONB for flexibility)
   invitation jsonb not null,
+  referred_by text,
+  coupon_code text,
+  coupon_discount integer,
 
   -- Customer info
   customer_name text,
@@ -59,6 +62,23 @@ create table if not exists public.rsvps (
 );
 
 create index if not exists rsvps_order_id_idx on public.rsvps (order_id);
+
+-- ============================================================
+-- GUESTS — invited guest list with personalized links
+-- ============================================================
+create table if not exists public.guests (
+  id text primary key,
+  order_id text references public.orders(id) on delete cascade not null,
+  name text not null,
+  phone text,
+  token text unique not null,
+  opened_at timestamptz,
+  rsvp_id text references public.rsvps(id) on delete set null,
+  created_at timestamptz default now() not null
+);
+
+create index if not exists guests_order_id_idx on public.guests (order_id);
+create index if not exists guests_token_idx on public.guests (token);
 
 -- ============================================================
 -- Row Level Security

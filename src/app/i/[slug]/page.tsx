@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getOrderBySlug, incrementViews } from "@/lib/orders";
+import { markGuestOpened } from "@/lib/guests";
 import { getTemplate } from "@/lib/templates";
 import { InvitationView } from "@/components/InvitationView";
 
@@ -18,8 +19,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function InvitationPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function InvitationPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ g?: string }>;
+}) {
   const { slug } = await params;
+  const sp = await searchParams;
+  if (sp.g) markGuestOpened(sp.g).catch(() => {});
   const order = await getOrderBySlug(slug);
   if (!order) notFound();
   if (order.status !== "paid") {

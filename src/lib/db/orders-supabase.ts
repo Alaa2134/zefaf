@@ -11,6 +11,9 @@ interface OrderRow {
   status: OrderStatus;
   price: number;
   remove_branding: boolean;
+  referred_by: string | null;
+  coupon_code: string | null;
+  coupon_discount: number | null;
   invitation: Order["invitation"];
   customer_name: string | null;
   customer_phone: string | null;
@@ -32,6 +35,9 @@ function fromRow(row: OrderRow, rsvps: RSVP[] = []): Order {
     status: row.status,
     price: row.price,
     removeBranding: row.remove_branding,
+    referredBy: row.referred_by ?? undefined,
+    couponCode: row.coupon_code ?? undefined,
+    couponDiscount: row.coupon_discount ?? undefined,
     invitation: row.invitation,
     customer: {
       name: row.customer_name ?? undefined,
@@ -141,6 +147,9 @@ export async function sb_createOrder(input: Omit<Order, "id" | "slug" | "created
       status: "pending_payment",
       price: input.price,
       remove_branding: input.removeBranding ?? false,
+      referred_by: input.referredBy ?? null,
+      coupon_code: input.couponCode ?? null,
+      coupon_discount: input.couponDiscount ?? null,
       invitation,
       customer_name: input.customer?.name,
       customer_phone: input.customer?.phone,

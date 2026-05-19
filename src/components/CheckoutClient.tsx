@@ -16,6 +16,7 @@ export function CheckoutClient({ orderId, order }: { orderId: string; order: Ord
   const [receiptImage, setReceiptImage] = useState<string | undefined>();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(order.status === "pending_review" || order.status === "paid");
@@ -47,7 +48,7 @@ export function CheckoutClient({ orderId, order }: { orderId: string; order: Ord
       const res = await fetch(`/api/orders/${orderId}/receipt`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ method, image: receiptImage, note, name, phone }),
+        body: JSON.stringify({ method, image: receiptImage, note, name, phone, email }),
       });
       if (res.ok) setSubmitted(true);
       else alert("حصلت مشكلة، حاول تاني");
@@ -203,6 +204,14 @@ export function CheckoutClient({ orderId, order }: { orderId: string; order: Ord
               placeholder="رقم واتساب للتواصل"
               dir="ltr"
               className="rounded-xl border border-ink-100 px-3 py-2.5 text-sm focus:border-gold-400 focus:outline-none"
+            />
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="إيميلك (اختياري — هنبعتلك تأكيد)"
+              type="email"
+              dir="ltr"
+              className="rounded-xl border border-ink-100 px-3 py-2.5 text-sm focus:border-gold-400 focus:outline-none sm:col-span-2"
             />
           </div>
 
